@@ -7,4 +7,13 @@ router.get('/', (req, res) => {
 });
 
 
+router.get('/agreement', (req, res) => {
+    res.render('agreement');
+});
+
+
+router.get('/privacy', (req, res) => {
+    res.render('privacy');
+});
+
 module.exports = router;
