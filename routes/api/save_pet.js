@@ -22,6 +22,7 @@ router.post('', async (req, res) => {
         let bId = req.body.bId;
         let gender = req.body.gender;
         let weight = req.body.weight; // NULL
+        let bcsStep = req.body.bcsStep;
         let bcs = req.body.bcs;
         let neuter = req.body.neuter;
         let inoculation = req.body.inoculation;
@@ -36,7 +37,7 @@ router.post('', async (req, res) => {
 
         // 필수값 체크
         if (isNone(name) || isNone(birth) || isNone(bId) || isNone(gender) ||
-            isNone(bcs) || isNone(neuter) || isNone(inoculation) || isNone(serial)) {
+            isNone(bcsStep) || isNone(neuter) || isNone(inoculation) || isNone(serial)) {
             res.json({ status: 'ERR_WRONG_PARAMS' });
             return;
         }
@@ -50,7 +51,7 @@ router.post('', async (req, res) => {
             res.json({ status: 'ERR_WRONG_PARAMS' });
             return;
         }
-        if (!isInt(bcs)) {
+        if (!isInt(bcsStep)) {
             res.json({ status: 'ERR_WRONG_PARAMS' });
             return;
         }
@@ -200,6 +201,11 @@ router.post('', async (req, res) => {
         //     }
         // }
 
+        bcsStep = parseInt(bcsStep);
+        if (bcsStep == 1 || bcsStep == 2) bcs = 1;
+        else if (bcsStep == 3 || bcsStep == 4) bcs = 2;
+        else bcs = 3;
+
         inoculationIdList = getJSONList(inoculationIdList);
         diseaseIdList = getJSONList(diseaseIdList);
         allergyIdList = getJSONList(allergyIdList);
@@ -210,10 +216,10 @@ router.post('', async (req, res) => {
 
         if (isNone(peId)) {
             // 펫 추가
-            query = "INSERT INTO t_pets (pe_u_id, pe_b_id, pe_name, pe_thumbnail, pe_birth, pe_bcs, pe_gender,";
+            query = "INSERT INTO t_pets (pe_u_id, pe_b_id, pe_name, pe_thumbnail, pe_birth, pe_bcs_step, pe_bcs, pe_gender,";
             query += " pe_neuter, pe_inoculation, pe_inoculation_text, pe_serial, pe_serial_no, pe_weight)";
-            query += " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            params = [uId, bId, name, thumbnail, birth, bcs, gender, neuter, inoculation, inoculationText, serial, serialNo, weight];
+            query += " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            params = [uId, bId, name, thumbnail, birth, bcsStep, bcs, gender, neuter, inoculation, inoculationText, serial, serialNo, weight];
             [result, fields] = await pool.query(query, params);
 
             peId = result.insertId;
@@ -258,11 +264,11 @@ router.post('', async (req, res) => {
             }
 
             // UPDATE
-            query = "UPDATE t_pets SET pe_b_id = ?, pe_name = ?, pe_thumbnail = ?, pe_birth = ?, pe_bcs = ?, pe_gender = ?,";
+            query = "UPDATE t_pets SET pe_b_id = ?, pe_name = ?, pe_thumbnail = ?, pe_birth = ?, pe_bcs_step = ?, pe_bcs = ?, pe_gender = ?,";
             query += " pe_neuter = ?, pe_inoculation = ?, pe_inoculation_text = ?, pe_serial = ?, pe_serial_no = ?, pe_weight = ?,";
             query += " pe_updated_date = NOW()";
             query += " WHERE pe_id = ? AND pe_u_id = ?";
-            params = [bId, name, thumbnail, birth, bcs, gender, neuter, inoculation, inoculationText, serial, serialNo, weight, peId, uId];
+            params = [bId, name, thumbnail, birth, bcsStep, bcs, gender, neuter, inoculation, inoculationText, serial, serialNo, weight, peId, uId];
             await pool.query(query, params);
 
             params = [peId];

@@ -14,14 +14,23 @@ router.get('', async (req, res) => {
 
         let keyword = req.query.keyword;
 
+        // if (isNone(keyword)) {
+        //     res.json({ status: 'ERR_WRONG_PARAMS' });
+        //     return;
+        // }
+
+        let query = "SELECT * FROM t_breeds";
+        let params = [];
+
         if (isNone(keyword)) {
-            res.json({ status: 'ERR_WRONG_PARAMS' });
-            return;
+            query += "";
+        } else {
+            query += " WHERE b_keyword LIKE ?";
+            params.push(`%${keyword}%`);
         }
 
-        let query = "SELECT * FROM t_breeds WHERE b_keyword LIKE ?";
-        let params = [`%${keyword}%`];
         let [result, fields] = await pool.query(query, params);
+        
         res.json({ status: 'OK', result: result });
 
     } catch(error) {

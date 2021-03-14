@@ -11,11 +11,20 @@ router.get('', async (req, res) => {
         //     res.json({ status: 'ERR_NO_PERMISSION' });
         //     return;
         // }
-        
+
         let pId = req.query.pId;
         let peId = req.query.peId;
 
-        let query = "SELECT * FROM t_pets WHERE pe_id = ?";
+        let query = "SELECT peTab.*,";
+
+        // 대상 펫의 나이대별 그룹 (유사견 산출 위함)
+        query += " IFNULL(";
+        query += " (SELECT GROUP_CONCAT(CONCAT_WS('~', bagTab.bag_min_age, bagTab.bag_max_age) SEPARATOR '|')";
+        query += " FROM t_breed_age_groups AS bagTab";
+        query += " WHERE bagTab.bag_b_id = peTab.pe_b_id)";
+        query += " , '') AS bags";
+
+        query += " FROM t_pets AS peTab WHERE peTab.pe_id = ?";
         let params = [peId];
         let [result, fields] = await pool.query(query, params);
 
@@ -40,6 +49,39 @@ router.get('', async (req, res) => {
         let costScore = 0;
         let sideCnt = 0;
 
+        let bagList = (pet.bags == '') ? [] : pet.bags.split('|'); // 나이대 그룹
+
+        let birth = pet.pe_birth.toString();
+        let birthYear = birth.substring(0, 4);
+        let birthMonth = birth.substring(4, 6);
+        let birthDay = birth.substring(6, 8);
+
+        let todayDate = new Date();
+        let birthDate = new Date(parseInt(birthYear), parseInt(birthMonth), parseInt(birthDay));
+
+        let diff = todayDate - birthDate;
+        let _month = 24 * 60 * 60 * 1000 * 30;
+
+        let monthAge = parseInt(diff / _month) + 1;
+        let yearAge = monthAge / 12;
+        let rangeMinAge = 0;
+        let rangeMaxAge = 99;
+
+        for (let i = 0; i < bagList.length; i++) {
+            let ages = bagList[i].split('~');
+            let minAge = ages[0];
+            let maxAge = ages[1];
+            if (minAge <= yearAge && yearAge <= maxAge) {
+                rangeMinAge = parseInt(minAge);
+                rangeMaxAge = parseInt(maxAge);
+                break;
+            }
+        }
+
+        let todayYear = todayDate.getFullYear();
+        let bagMinYear = todayYear + rangeMinAge;
+        let bagMaxYear = todayYear - rangeMaxAge;
+
         // 유사견 리스트 뽑기
         query = "SELECT peTab.pe_id";
 
@@ -48,7 +90,7 @@ router.get('', async (req, res) => {
         // 유사견 > 견종, 출생일 +- 1년, 신체지수, 성별
         query += " WHERE peTab.pe_b_id = ? AND peTab.pe_birth >= ? AND peTab.pe_birth <= ?";
         query += " AND peTab.pe_bcs = ? AND peTab.pe_gender = ?";
-        params = [pet.pe_b_id, pet.pe_birth - 10000, pet.pe_birth + 10000, pet.pe_bcs, pet.pe_gender];
+        params = [pet.pe_b_id, bagMaxYear * 10000, bagMinYear * 10000, pet.pe_bcs, pet.pe_gender];
         [result, fields] = await pool.query(query, params);
 
         // 유사견들이 해당 제품에 남긴 리뷰 가져오기
