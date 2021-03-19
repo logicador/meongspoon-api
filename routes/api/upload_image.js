@@ -34,6 +34,8 @@ router.post('', (req, res) => {
 
             let imageName = generateRandomId();
 
+            console.log(uId, imageName);
+
             // 이미지 프로세싱
             let imagePath = `public/images/users/${uId}/${imageName}.jpg`;
             let originalImagePath = `public/images/users/${uId}/original/${imageName}.jpg`;
@@ -44,7 +46,7 @@ router.post('', (req, res) => {
                     let rw = 0;
                     while (true) {
                         if (fs.statSync(imagePath).size > 100000) {
-                            rw += 2;
+                            rw += 10;
                             await sharp(originalImagePath)
                                 .resize({ width: parseInt(originalWidth * ((100 - rw) / 100)) })
                                 .toFile(imagePath);

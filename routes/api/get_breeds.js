@@ -7,10 +7,10 @@ const pool = require('../../lib/database');
 // 견종 가져오기
 router.get('', async (req, res) => {
     try {
-        if (!isLogined(req.session)) {
-            res.json({ status: 'ERR_NO_PERMISSION' });
-            return;
-        }
+        // if (!isLogined(req.session)) {
+        //     res.json({ status: 'ERR_NO_PERMISSION' });
+        //     return;
+        // }
 
         let keyword = req.query.keyword;
 
@@ -29,8 +29,10 @@ router.get('', async (req, res) => {
             params.push(`%${keyword}%`);
         }
 
+        query += " ORDER BY b_name ASC";
+
         let [result, fields] = await pool.query(query, params);
-        
+
         res.json({ status: 'OK', result: result });
 
     } catch(error) {

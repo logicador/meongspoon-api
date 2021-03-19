@@ -35,12 +35,24 @@ router.post('', async (req, res) => {
         let diseaseIdList = req.body.diseaseIdList; // NULL
         let allergyIdList = req.body.allergyIdList; // NULL
 
+        console.log("name", name);
+        console.log("birth", birth);
+        console.log("bId", bId);
+        console.log("gender", gender);
+        console.log("bcsStep", bcsStep);
+        console.log("neuter", neuter);
+        console.log("inoculation", inoculation);
+        console.log("inoculationIdList", inoculationIdList);
+        console.log("serial", serial);
+
+
         // 필수값 체크
         if (isNone(name) || isNone(birth) || isNone(bId) || isNone(gender) ||
             isNone(bcsStep) || isNone(neuter) || isNone(inoculation) || isNone(serial)) {
             res.json({ status: 'ERR_WRONG_PARAMS' });
             return;
         }
+
 
         // 숫자 체크
         if (!isInt(birth)) {
@@ -67,6 +79,8 @@ router.post('', async (req, res) => {
             res.json({ status: 'ERR_WRONG_PARAMS' });
             return;
         }
+
+
 
         // 성별 체크
         if (gender != 'M' && gender != 'F') {
@@ -343,8 +357,6 @@ router.post('', async (req, res) => {
         [result, fields] = await pool.query(query, params);
 
         let pet = result[0];
-        pet.age = 1.2;
-
         res.json({ status: 'OK', result: pet });
 
     } catch(error) {

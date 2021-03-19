@@ -49,8 +49,6 @@ router.post('', async (req, res) => {
                 params.push(`/images/users/${uId}/${imageList[i]}.jpg`);
                 params.push(prId);
             }
-            console.log(query);
-            console.log(params);
             await pool.query(query, params);
         }
 

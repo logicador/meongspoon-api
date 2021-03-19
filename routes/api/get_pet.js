@@ -34,7 +34,8 @@ router.get('', async (req, res) => {
             return;
         }
 
-        res.json({ status: 'OK', result: result[0] });
+        let pet = result[0];
+        res.json({ status: 'OK', result: pet });
 
     } catch(error) {
         console.log(error);

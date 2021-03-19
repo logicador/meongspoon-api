@@ -23,6 +23,9 @@ router.use('/get/pet/inoculations', require('./api/get_pet_inoculations.js'));
 router.use('/get/pet/products', require('./api/get_pet_products.js'));
 router.use('/get/pet/diseases', require('./api/get_pet_diseases.js'));
 router.use('/get/pet/food/categories2', require('./api/get_pet_food_categories2.js'));
+router.use('/get/questions', require('./api/get_questions.js'));
+router.use('/get/user/reviews', require('./api/get_user_reviews.js'));
+router.use('/get/product', require('./api/get_product.js'));
 
 
 // POST
@@ -34,6 +37,8 @@ router.use('/add/review', require('./api/add_review.js'));
 router.use('/leave', require('./api/leave.js'));
 router.use('/add/question', require('./api/add_question.js'));
 router.use('/edit/pet', require('./api/edit_pet.js'));
+router.use('/remove/question', require('./api/remove_question.js'));
+router.use('/remove/review', require('./api/remove_review.js'));
 
 
 // POST - FILE
