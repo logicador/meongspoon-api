@@ -23,7 +23,7 @@ router.post('', (req, res) => {
 
         let uId = req.session.uId;
 
-        form.parse(req, (error, body, files) => {
+        form.parse(req, async (error, body, files) => {
             if (error) {
                 if (fs.existsSync(files.image.path)) {
                     fs.unlinkSync(files.image.path);
@@ -34,12 +34,13 @@ router.post('', (req, res) => {
 
             let imageName = generateRandomId();
 
-            console.log(uId, imageName);
-
             // 이미지 프로세싱
             let imagePath = `public/images/users/${uId}/${imageName}.jpg`;
             let originalImagePath = `public/images/users/${uId}/original/${imageName}.jpg`;
-            fs.rename(files.image.path, imagePath, () => {
+            await sharp(files.image.path).rotate().toFile(imagePath);
+            fs.unlinkSync(files.image.path);
+
+            // fs.rename(files.image.path, imagePath, () => {
                 fs.copyFile(imagePath, originalImagePath, async () => {
 
                     let originalWidth = imageSize(originalImagePath).width;
@@ -55,7 +56,7 @@ router.post('', (req, res) => {
 
                     res.json({ status: 'OK', result: parseInt(imageName) });
                 });
-            });
+            // });
         });
 
     } catch(error) {

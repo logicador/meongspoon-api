@@ -140,14 +140,109 @@ router.get('', async (req, res) => {
             orderedDiseaseIdList.push(cntDiseaseIdList[i].dId);
         }
 
+        let goodFoodList = []; // 좋은 음식 (병력 질병 기반)
+        let goodNutrientList = []; // 좋은 영양소 (병력 질병 기반)
         // TODO: 현재 질병쪽에 연관 데이터가 없어서 못함
         // petDiseaseIdList 갖고 t_maps_disease_nutrient_food 조회해서 긍정적 음식 및 영양소
         if (petDiseaseIdList.length > 0) {
+            query = "SELECT * FROM t_maps_disease_nutrient_food WHERE mdnf_d_id IN (";
+            params = [];
+            for (let i = 0; i < petDiseaseIdList.length; i++) {
+                if (i > 0) query += " ,";
+                query += " ?";
+                params.push(petDiseaseIdList[i]);
+            }
+            query += " )";
+            [result, fields] = await pool.query(query, params);
 
+            let foodIdList = [];
+            let nutrientIdList = [];
+            for (let i = 0; i < result.length; i++) {
+                if (result[i].mdnf_type == 'FOOD') {
+                    foodIdList.push(result[i].mdnf_target_id);
+                } else {
+                    nutrientIdList.push(result[i].mdnf_target_id);
+                }
+            }
+
+            if (foodIdList.length > 0) {
+                query = "SELECT * FROM t_foods WHERE f_id IN (";
+                params = [];
+                for (let i = 0; i < foodIdList.length; i++) {
+                    if (i > 0) query += " ,";
+                    query += " ?";
+                    params.push(foodIdList[i]);
+                }
+                query += " )";
+                [result, fields] = await pool.query(query, params);
+                goodFoodList = result;
+            }
+
+            if (nutrientIdList.length > 0) {
+                query = "SELECT * FROM t_nutrients WHERE n_id IN (";
+                params = [];
+                for (let i = 0; i < nutrientIdList.length; i++) {
+                    if (i > 0) query += " ,";
+                    query += " ?";
+                    params.push(nutrientIdList[i]);
+                }
+                query += " )";
+                [result, fields] = await pool.query(query, params);
+                goodNutrientList = result;
+            }
         }
 
+        let similarGoodFoodList = []; // 유사견 좋은 음식 (취약질병 기반)
+        let similarGoodNutrientList = []; // 유사견 좋은 영양소 (취약질병 기반)
         // TODO: 현재 질병쪽에 연관 데이터가 없어서 못함
         // orderedDiseaseIdList 갖고 t_maps_disease_nutrient_food 조회해서 긍정적 음식 및 영양소
+        if (orderedDiseaseIdList.length > 0) {
+            query = "SELECT * FROM t_maps_disease_nutrient_food WHERE mdnf_d_id IN (";
+            params = [];
+            for (let i = 0; i < orderedDiseaseIdList.length; i++) {
+                if (i > 0) query += " ,";
+                query += " ?";
+                params.push(orderedDiseaseIdList[i]);
+            }
+            query += " )";
+            [result, fields] = await pool.query(query, params);
+
+            let foodIdList = [];
+            let nutrientIdList = [];
+            for (let i = 0; i < result.length; i++) {
+                if (result[i].mdnf_type == 'FOOD') {
+                    foodIdList.push(result[i].mdnf_target_id);
+                } else {
+                    nutrientIdList.push(result[i].mdnf_target_id);
+                }
+            }
+
+            if (foodIdList.length > 0) {
+                query = "SELECT * FROM t_foods WHERE f_id IN (";
+                params = [];
+                for (let i = 0; i < foodIdList.length; i++) {
+                    if (i > 0) query += " ,";
+                    query += " ?";
+                    params.push(foodIdList[i]);
+                }
+                query += " )";
+                [result, fields] = await pool.query(query, params);
+                similarGoodFoodList = result;
+            }
+
+            if (nutrientIdList.length > 0) {
+                query = "SELECT * FROM t_nutrients WHERE n_id IN (";
+                params = [];
+                for (let i = 0; i < nutrientIdList.length; i++) {
+                    if (i > 0) query += " ,";
+                    query += " ?";
+                    params.push(nutrientIdList[i]);
+                }
+                query += " )";
+                [result, fields] = await pool.query(query, params);
+                similarGoodNutrientList = result;
+            }
+        }
 
         // 취약질병 5개 가져오기
         let weakDiseaseList = [];
@@ -178,13 +273,8 @@ router.get('', async (req, res) => {
             }
         }
 
-        let warningFoodList = []; // 주의 음식
-        let warningNutrientList = []; // 주의 영양소
-        let goodFoodList = []; // 좋은 음식 (병력 질병 기반)
-        let goodNutrientList = []; // 좋은 영양소 (병력 질병 기반)
-        let similarGoodFoodList = []; // 유사견 좋은 음식 (취약질병 기반)
-        let similarGoodNutrientList = []; // 유사견 좋은 영양소 (취약질병 기반)
-
+        let warningFoodList = []; // 주의 음식 알러지 기반
+        let warningNutrientList = []; // 주의 영양소 알러지 기반
         // petFoodCategory2IdList 로부터 주의성분(음식, 영양소) 가져오기
         if (petFoodCategory2IdList.length > 0) {
             query = "SELECT fTab.*,";
@@ -229,11 +319,6 @@ router.get('', async (req, res) => {
             warningNutrientList = result;
             }
         }
-
-        goodFoodList = warningFoodList;
-        goodNutrientList = warningNutrientList;
-        similarGoodFoodList = warningFoodList;
-        similarGoodNutrientList = warningNutrientList;
 
         res.json({ status: 'OK', result: {
             warningFoodList: warningFoodList,

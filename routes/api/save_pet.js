@@ -63,12 +63,15 @@ router.post('', async (req, res) => {
             res.json({ status: 'ERR_WRONG_PARAMS' });
             return;
         }
+
         if (!isInt(bcsStep)) {
             res.json({ status: 'ERR_WRONG_PARAMS' });
             return;
         }
+
         if (!isNone(feedPId) && !isInt(feedPId)) {
             res.json({ status: 'ERR_WRONG_PARAMS' });
+            console.log("여기서 에러남");
             return;
         }
         if (!isNone(snackPId) && !isInt(snackPId)) {

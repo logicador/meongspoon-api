@@ -14,6 +14,9 @@ router.post('', async (req, res) => {
         let uId = req.session.uId;
         let qId = req.body.qId;
 
+        console.log("uId:", uId);
+        console.log("qId:", qId);
+
         let query = "SELECT * FROM t_questions WHERE q_id = ? AND q_u_id = ?";
         let params = [qId, uId];
 
