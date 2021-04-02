@@ -7,10 +7,10 @@ const pool = require('../../lib/database');
 // 제품 검색
 router.get('', async (req, res) => {
     try {
-        // if (!isLogined(req.session)) {
-        //     res.json({ status: 'ERR_NO_PERMISSION' });
-        //     return;
-        // }
+        if (!isLogined(req.session)) {
+            res.json({ status: 'ERR_NO_PERMISSION' });
+            return;
+        }
 
         let tab = req.query.tab; // SIMILAR, OTHER
         let category = req.query.category; // ALL FEED SUPPLEMENT SNACK

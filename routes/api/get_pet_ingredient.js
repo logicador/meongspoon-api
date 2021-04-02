@@ -7,10 +7,10 @@ const pool = require('../../lib/database');
 // 펫과 관련된 음식, 영양소 정보 가져오기
 router.get('', async (req, res) => {
     try {
-        // if (!isLogined(req.session)) {
-        //     res.json({ status: 'ERR_NO_PERMISSION' });
-        //     return;
-        // }
+        if (!isLogined(req.session)) {
+            res.json({ status: 'ERR_NO_PERMISSION' });
+            return;
+        }
 
         let peId = req.query.peId;
 

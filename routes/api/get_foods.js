@@ -7,10 +7,10 @@ const pool = require('../../lib/database');
 // 음식 가져오기
 router.get('', async (req, res) => {
     try {
-        // if (!isLogined(req.session)) {
-        //     res.json({ status: 'ERR_NO_PERMISSION' });
-        //     return;
-        // }
+        if (!isLogined(req.session)) {
+            res.json({ status: 'ERR_NO_PERMISSION' });
+            return;
+        }
 
         // let bpId = req.query.bpId;
         let keyword = req.query.keyword;

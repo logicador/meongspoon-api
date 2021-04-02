@@ -7,13 +7,13 @@ const pool = require('../../lib/database');
 // 알러지 가져오기 allergy
 router.get('', async (req, res) => {
     try {
-        // if (!isLogined(req.session)) {
-        //     res.json({ status: 'ERR_NO_PERMISSION' });
-        //     return;
-        // }
-    
+        if (!isLogined(req.session)) {
+            res.json({ status: 'ERR_NO_PERMISSION' });
+            return;
+        }
+
         let fc1Id = req.query.fc1Id;
-    
+
         if (isNone(fc1Id)) {
             fc1Id = 'ALL';
         }
@@ -29,16 +29,16 @@ router.get('', async (req, res) => {
         query += " GROUP_CONCAT(CONCAT_WS(':', fc2_id, fc2_name) SEPARATOR '|') AS fc2";
         query += " FROM t_food_categories2 GROUP BY fc2_fc1_id) AS fc2Tab";
         query += " ON fc2Tab.fc2_fc1_id = fc1Tab.fc1_id";
-        
+
         let params = [];
-    
+
         if (fc1Id != 'ALL') {
             query += " WHERE fc1Tab.fc1_id = ?";
             params.push(fc1Id);
         }
-    
+
         [result, fields] = await pool.query(query, params);
-    
+
         res.json({ status: 'OK', result: result });
 
     } catch(error) {

@@ -7,10 +7,10 @@ const pool = require('../../lib/database');
 // 증상 가져오기
 router.get('', async (req, res) => {
     try {
-        // if (!isLogined(req.session)) {
-        //     res.json({ status: 'ERR_NO_PERMISSION' });
-        //     return;
-        // }
+        if (!isLogined(req.session)) {
+            res.json({ status: 'ERR_NO_PERMISSION' });
+            return;
+        }
 
         let uId = req.session.uId;
         let sId = req.query.sId;
