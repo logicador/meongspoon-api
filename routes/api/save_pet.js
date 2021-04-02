@@ -69,15 +69,14 @@ router.post('', async (req, res) => {
             return;
         }
 
-        if (!isNone(feedPId) && !isInt(feedPId)) {
-            res.json({ status: 'ERR_WRONG_PARAMS' });
-            console.log("여기서 에러남");
-            return;
-        }
-        if (!isNone(snackPId) && !isInt(snackPId)) {
-            res.json({ status: 'ERR_WRONG_PARAMS' });
-            return;
-        }
+        // if (!isNone(feedPId) && !isInt(feedPId)) {
+        //     res.json({ status: 'ERR_WRONG_PARAMS' });
+        //     return;
+        // }
+        // if (!isNone(snackPId) && !isInt(snackPId)) {
+        //     res.json({ status: 'ERR_WRONG_PARAMS' });
+        //     return;
+        // }
         if (!isNone(peId) && !isInt(peId)) {
             res.json({ status: 'ERR_WRONG_PARAMS' });
             return;

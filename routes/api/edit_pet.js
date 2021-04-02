@@ -15,8 +15,6 @@ router.post('', async (req, res) => {
         let uId = req.session.uId;
         let peId = req.body.peId;
         let imageName = req.body.imageName;
-        console.log("uId:", uId);
-        console.log("peId:", peId);
 
         let thumbnail = `/images/users/${uId}/${imageName}.jpg`;
 
