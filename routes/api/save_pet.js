@@ -35,16 +35,6 @@ router.post('', async (req, res) => {
         let diseaseIdList = req.body.diseaseIdList; // NULL
         let allergyIdList = req.body.allergyIdList; // NULL
 
-        console.log("name", name);
-        console.log("birth", birth);
-        console.log("bId", bId);
-        console.log("gender", gender);
-        console.log("bcsStep", bcsStep);
-        console.log("neuter", neuter);
-        console.log("inoculation", inoculation);
-        console.log("inoculationIdList", inoculationIdList);
-        console.log("serial", serial);
-
 
         // 필수값 체크
         if (isNone(name) || isNone(birth) || isNone(bId) || isNone(gender) ||
