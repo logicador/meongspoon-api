@@ -26,6 +26,7 @@ router.use('/get/pet/food/categories2', require('./api/get_pet_food_categories2.
 router.use('/get/questions', require('./api/get_questions.js'));
 router.use('/get/user/reviews', require('./api/get_user_reviews.js'));
 router.use('/get/product', require('./api/get_product.js'));
+router.use('/get/breed/characters', require('./api/get_breed_characters.js'));
 
 
 // POST
